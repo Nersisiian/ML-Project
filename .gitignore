@@ -1,106 +1,52 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+dist/
+build/
 
-# Virtual Environment
+# Virtual environments
 venv/
-.virtualenv/
+.env/
+.venv/
+
+# IDE
 .vscode/
 .idea/
-
-# Jupyter Notebook
-.ipynb_checkpoints/
-*.ipynb
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# Logs
-logs/
-*.log
-log/
-*.pid
-*.seed
-*.pid.lock
+*.swp
 
 # Testing
 .pytest_cache/
 .coverage
-.coverage.*
 htmlcov/
 .tox/
-.mypy_cache/
-.ruff_cache/
+
+# Logs
+*.log
+logs/
+
+# Models
+*.pkl
+*.joblib
+*.h5
+*.pt
+
+# Data
+data/raw/
+data/processed/
+*.parquet
 
 # MLflow
 mlruns/
 mlflow.db
 
-# Data files
-*.parquet
-*.csv
-*.pkl
-*.joblib
-*.h5
-*.pt
-*.pth
-*.onnx
-*.tflite
-
-# Model files
-models/*.pkl
-models/*.joblib
-models/saved_models/
-
-# Feature store
-feature_store/
-*.db
-
-# Docker
-*.tar
-*.gz
+# Secrets
+*.key
+*.pem
+.env.local
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Secret files
-*.key
-*.pem
-*.crt
-secrets/
-
-# Spark
-spark-warehouse/
-derby.log
-metastore_db/
-
-# Great Expectations
-great_expectations/uncommitted/
-
-# DVC
-.dvc/
-*.dvc
