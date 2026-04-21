@@ -1,0 +1,21 @@
+﻿services:
+  - type: web
+    name: ml-project-api
+    runtime: image
+    repo: https://github.com/Nersisiian/ML-Project
+    branch: main
+    plan: free
+    dockerfilePath: ./docker/Dockerfile.api
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: ml-redis
+          property: connectionString
+
+  - type: redis
+    name: ml-redis
+    plan: free
+    maxmemory: 256
