@@ -1,43 +1,45 @@
-# docker/docker-compose.yml
 version: '3.8'
 
 services:
-  # PostgreSQL for metadata
   postgres:
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: mlflow
       POSTGRES_USER: mlflow
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: mlflow123
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - ml-network
-    deploy:
-      resources:
-        limits:
-          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Redis for caching
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
     networks:
       - ml-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # MinIO for artifact storage (S3 alternative)
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+      MINIO_ROOT_PASSWORD: minio123
     volumes:
       - minio_data:/data
     ports:
@@ -45,113 +47,83 @@ services:
       - "9001:9001"
     networks:
       - ml-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
-  # MLflow Tracking Server
   mlflow:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.mlflow
     environment:
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_ACCESS_KEY_ID: minioadmin
-      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      AWS_SECRET_ACCESS_KEY: minio123
     command: >
       mlflow server
       --host 0.0.0.0
       --port 5000
-      --backend-store-uri postgresql://mlflow:${POSTGRES_PASSWORD}@postgres/mlflow
+      --backend-store-uri postgresql://mlflow:mlflow123@postgres/mlflow
       --default-artifact-root s3://mlflow-artifacts/
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     ports:
       - "5000:5000"
     networks:
       - ml-network
 
-  # Feast Feature Store
-  feast:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.feast
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      FEAST_REDIS_HOST: redis
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - ml-network
-
-  # API Service
   api:
     build:
       context: ..
       dockerfile: docker/Dockerfile.api
     environment:
       REDIS_URL: redis://redis:6379/0
-      POSTGRES_URL: postgresql://mlflow:${POSTGRES_PASSWORD}@postgres/mlflow
+      POSTGRES_URL: postgresql://mlflow:mlflow123@postgres/mlflow
       MLFLOW_TRACKING_URI: http://mlflow:5000
-      MODEL_BUCKET: s3://models/
+      MODEL_NAME: real_estate_predictor
+      MODEL_STAGE: Production
     depends_on:
-      - redis
-      - mlflow
-      - feast
+      redis:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
     ports:
       - "8000:8000"
     networks:
       - ml-network
     deploy:
-      replicas: 3
+      replicas: 2
       resources:
         limits:
-          memory: 2G
-          cpus: '1.0'
-      restart_policy:
-        condition: any
+          memory: 1G
+          cpus: '0.5'
 
-  # Nginx Load Balancer
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    ports:
-      - "80:80"
-    depends_on:
-      - api
-    networks:
-      - ml-network
-    deploy:
-      replicas: 2
-
-  # Prometheus
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - "9090:9090"
     networks:
       - ml-network
 
-  # Grafana
   grafana:
     image: grafana/grafana:latest
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_SECURITY_ADMIN_PASSWORD: admin
       GF_INSTALL_PLUGINS: grafana-piechart-panel
     volumes:
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
       - grafana_data:/var/lib/grafana
     ports:
       - "3000:3000"
@@ -159,22 +131,6 @@ services:
       - ml-network
     depends_on:
       - prometheus
-
-  # Training Job (runs on schedule)
-  trainer:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.trainer
-    environment:
-      MLFLOW_TRACKING_URI: http://mlflow:5000
-      FEAST_REDIS_HOST: redis
-    volumes:
-      - ./models:/app/models
-    networks:
-      - ml-network
-    deploy:
-      mode: replicated
-      replicas: 0  # Scale to 1 when needed
 
 networks:
   ml-network:
