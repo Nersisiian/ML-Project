@@ -38,6 +38,7 @@
 ---
 
 ## 🏗️ **System Architecture**
+```
 ┌─────────────────────────────────────────────────────────────┐
 │ Load Balancer (Nginx) │
 └─────────────────────────┬───────────────────────────────────┘
@@ -58,14 +59,15 @@
 │ Cache │ │ Feature │ │ Model │
 │ L1+L2 │ │ Store │ │ Registry │
 └──────────┘ └──────────┘ └──────────┘
+```
 
-text
 
 ---
 
 ## 🛠️ **Tech Stack**
 
 ### Backend & API
+```
 | Технология | Назначение |
 |------------|------------|
 | **FastAPI** | Асинхронный веб-фреймворк |
@@ -94,7 +96,7 @@ text
 | **PostgreSQL** | База данных |
 
 ---
-
+````
 ## 🚀 **Quick Start (30 секунд)**
 
 ### Локальный запуск
@@ -102,18 +104,21 @@ text
 # Клонируй репозиторий
 git clone https://github.com/Nersisiian/ML-Project.git
 cd ML-Project
-
+```
 # Запусти все сервисы через Docker
+```
 docker-compose -f docker/docker-compose.yml up -d
-
+```
 # Открой в браузере
+```
 open http://localhost:8000
 Тестирование API
 bash
 # Health check
 curl https://ml-project-2ft6.onrender.com/health
-
+```
 # Получить предсказание
+```
 curl -X POST https://ml-project-2ft6.onrender.com/api/v1/predict \
   -H "Content-Type: application/json" \
   -H "X-API-Key: demo-key" \
@@ -124,7 +129,10 @@ curl -X POST https://ml-project-2ft6.onrender.com/api/v1/predict \
     "year_built": 2010,
     "zipcode": "94105"
   }'
+
+```
 📈 Monitoring & Observability
+```
 СервисURLЛогин/Пароль
 Prometheushttp://localhost:9090-
 Grafanahttp://localhost:3000admin / admin
@@ -141,12 +149,15 @@ data_drift_score - дрейф данных
 
 cache_hit_ratio - эффективность кэша
 
+
+```
 🧪 Testing Strategy
+```
 Запуск тестов
 bash
 # Все тесты (43 теста)
 make test
-
+```
 # Unit тесты
 pytest tests/unit/ -v
 
@@ -175,8 +186,10 @@ dockerСборка Docker образа~60s
 deployДеплой на Render~90s
 Статус: https://github.com/Nersisiian/ML-Project/actions/workflows/ci.yml/badge.svg
 
+
+``
 📁 Project Structure
-text
+```
 ML-Project/
 ├── app/                    # FastAPI приложение
 │   ├── api/               # API endpoints
@@ -200,7 +213,11 @@ ML-Project/
 ├── monitoring/           # Prometheus + Grafana
 ├── scripts/              # Утилиты
 └── notebooks/            # Jupyter ноутбуки
+
+
+```
 🎓 Production Features
+
 ✅ Async processing with connection pooling
 
 ✅ Multi-level caching (L1 memory + L2 Redis)
@@ -225,10 +242,12 @@ ML-Project/
 
 ✅ Auto-deployment on Git push
 
+``
 🔐 Environment Variables
 Создай .env файл:
 
-bash
+```
+```
 # API
 API_RATE_LIMIT=100
 ALLOWED_ORIGINS=*
@@ -242,11 +261,13 @@ MLFLOW_TRACKING_URI=http://localhost:5000
 MODEL_NAME=real_estate_predictor
 MODEL_STAGE=Production
 
+``
+``
 # Authentication
 API_KEYS=your-api-key-here
 🚢 Deployment
 Deploy to Render (бесплатно)
-bash
+
 # 1. Форкни репозиторий
 # 2. Зарегистрируйся на https://render.com
 # 3. Нажми "New +" → "Web Service"
@@ -256,10 +277,13 @@ bash
 #    - Start Command: uvicorn app.main:app --host 0.0.0.0 --port 10000
 # 6. Нажми "Deploy"
 Deploy to Kubernetes
-bash
+
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
+
+``
 📊 API Documentation
+`
 После запуска доступна автоматическая документация:
 
 Swagger UI: http://localhost:8000/api/docs
@@ -267,7 +291,8 @@ Swagger UI: http://localhost:8000/api/docs
 ReDoc: http://localhost:8000/api/redoc
 
 OpenAPI JSON: http://localhost:8000/api/openapi.json
-
+````
+````
 Основные эндпоинты
 MethodEndpointDescription
 POST/api/v1/predictПредсказание цены
@@ -275,9 +300,11 @@ POST/api/v1/predict/batchBatch предсказания
 GET/api/v1/healthHealth check
 GET/metricsPrometheus метрики
 GET/api/v1/demoДемо информация
+````
+````
 👨‍💻 Author
 ML Engineering Team
-
+`
 https://img.shields.io/badge/GitHub-Nersisiian-blue
 https://img.shields.io/badge/LinkedIn-Connect-blue
 
