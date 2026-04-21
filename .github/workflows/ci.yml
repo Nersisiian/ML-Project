@@ -16,8 +16,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install fastapi uvicorn numpy pandas lightgbm pytest
-      - name: Run tests
+      - name: Run all tests
         run: |
-          pytest tests/simple_test.py tests/full_test.py -v
-      - name: Success
-        run: echo "✅ CI passed!"
+          pytest tests/simple_test.py tests/full_test.py tests/complete_test.py -v
+      - name: Count tests
+        run: |
+          echo "✅ All tests passed!"
