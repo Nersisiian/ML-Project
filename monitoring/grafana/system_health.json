@@ -1,0 +1,55 @@
+{
+  "dashboard": {
+    "title": "System Health Dashboard",
+    "panels": [
+      {
+        "title": "API Request Rate",
+        "targets": [{
+          "expr": "rate(http_requests_total[5m])",
+          "legendFormat": "req/s"
+        }],
+        "type": "graph"
+      },
+      {
+        "title": "API Response Time (p95)",
+        "targets": [{
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95 latency"
+        }],
+        "type": "graph"
+      },
+      {
+        "title": "Error Rate",
+        "targets": [{
+          "expr": "rate(http_requests_total{status=~'5..'}[5m]) / rate(http_requests_total[5m])",
+          "legendFormat": "error rate"
+        }],
+        "type": "graph"
+      },
+      {
+        "title": "CPU Usage",
+        "targets": [{
+          "expr": "rate(process_cpu_seconds_total[5m])",
+          "legendFormat": "CPU"
+        }],
+        "type": "gauge"
+      },
+      {
+        "title": "Memory Usage",
+        "targets": [{
+          "expr": "process_resident_memory_bytes",
+          "legendFormat": "memory"
+        }],
+        "type": "gauge"
+      },
+      {
+        "title": "Redis Cache Hit Ratio",
+        "targets": [{
+          "expr": "cache_hit_ratio",
+          "legendFormat": "hit ratio"
+        }],
+        "type": "gauge"
+      }
+    ]
+  }
+}

@@ -1,0 +1,161 @@
+# Data schema configuration
+version: "1.0"
+
+dataset:
+  name: real_estate_properties
+  description: Real estate property data for price prediction
+  
+columns:
+  property_id:
+    type: string
+    required: true
+    unique: true
+    description: Unique property identifier
+    
+  square_feet:
+    type: float
+    required: true
+    min: 100
+    max: 50000
+    description: Total square footage of the property
+    
+  bedrooms:
+    type: integer
+    required: true
+    min: 0
+    max: 10
+    description: Number of bedrooms
+    
+  bathrooms:
+    type: float
+    required: true
+    min: 0
+    max: 10
+    description: Number of bathrooms
+    
+  year_built:
+    type: integer
+    required: true
+    min: 1800
+    max: 2024
+    description: Year the property was built
+    
+  lot_size:
+    type: float
+    required: false
+    min: 0
+    max: 100000
+    default: 0
+    description: Lot size in square feet
+    
+  zipcode:
+    type: string
+    required: true
+    pattern: '^\d{5}$'
+    description: 5-digit zipcode
+    
+  latitude:
+    type: float
+    required: false
+    min: -90
+    max: 90
+    description: Geographic latitude
+    
+  longitude:
+    type: float
+    required: false
+    min: -180
+    max: 180
+    description: Geographic longitude
+    
+  price:
+    type: float
+    required: true
+    min: 10000
+    max: 10000000
+    description: Property price
+    
+  pool:
+    type: boolean
+    required: false
+    default: false
+    description: Whether property has a pool
+    
+  fireplace:
+    type: boolean
+    required: false
+    default: false
+    description: Whether property has a fireplace
+    
+  garage_spaces:
+    type: integer
+    required: false
+    min: 0
+    max: 10
+    default: 0
+    description: Number of garage spaces
+    
+  condition_score:
+    type: float
+    required: false
+    min: 1
+    max: 10
+    default: 5
+    description: Property condition rating (1-10)
+
+derived_features:
+  property_age:
+    type: integer
+    expression: "2024 - year_built"
+    description: Age of property in years
+    
+  property_age_squared:
+    type: integer
+    expression: "property_age ** 2"
+    description: Squared age for non-linear effects
+    
+  sqft_per_bedroom:
+    type: float
+    expression: "square_feet / (bedrooms + 1)"
+    description: Square footage per bedroom
+    
+  bed_bath_ratio:
+    type: float
+    expression: "bedrooms / (bathrooms + 1)"
+    description: Bedroom to bathroom ratio
+    
+  log_sqft:
+    type: float
+    expression: "log1p(square_feet)"
+    description: Log transformed square footage
+    
+  is_new_construction:
+    type: boolean
+    expression: "property_age < 5"
+    description: Whether property is newer than 5 years
+    
+  is_luxury:
+    type: boolean
+    expression: "square_feet > 3000 and bedrooms > 4"
+    description: Luxury property indicator
+
+validation_rules:
+  required_columns:
+    - property_id
+    - square_feet
+    - bedrooms
+    - bathrooms
+    - year_built
+    - price
+    
+  unique_columns:
+    - property_id
+    
+  null_threshold: 0.3
+  
+  outlier_method: iqr
+  outlier_multiplier: 1.5
+  
+  distribution_tests:
+    - kolmogorov_smirnov
+    - chi_square

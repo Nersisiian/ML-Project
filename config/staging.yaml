@@ -1,0 +1,65 @@
+# Staging environment configuration
+environment: staging
+
+app:
+  debug: true
+  log_level: DEBUG
+  reload: true
+
+model:
+  stage: Staging
+  version: latest
+  
+data:
+  raw_path: s3://real-estate-staging/raw/
+  processed_path: s3://real-estate-staging/processed/
+  feature_path: s3://real-estate-staging/features/
+  
+training:
+  batch_size: 512
+  n_epochs: 50
+  n_trials: 20
+  use_gpu: false
+  
+api:
+  host: 0.0.0.0
+  port: 8000
+  workers: 2
+  rate_limit: 500  # requests per minute
+  
+monitoring:
+  enabled: true
+  metrics_port: 9090
+  log_requests: true
+  
+database:
+  redis:
+    host: redis-staging
+    port: 6379
+    db: 0
+    
+  postgres:
+    host: postgres-staging
+    port: 5432
+    database: mlflow_staging
+    
+feature_store:
+  online_store:
+    type: redis
+    host: redis-staging
+    port: 6379
+    
+  offline_store:
+    type: s3
+    bucket: real-estate-staging
+    prefix: features/
+
+deployment:
+  replicas: 2
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"

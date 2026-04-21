@@ -1,0 +1,25 @@
+# Production environment config
+app:
+  debug: false
+
+model:
+  stage: "Production"
+
+training:
+  batch_size: 2048
+  n_epochs: 200
+
+inference:
+  cache_ttl: 3600
+  max_concurrent_requests: 10000
+
+monitoring:
+  log_level: "WARNING"
+  drift_threshold: 0.15
+
+resources:
+  api_replicas: 5
+  api_cpu: "2"
+  api_memory: "4Gi"
+  trainer_cpu: "8"
+  trainer_memory: "16Gi"

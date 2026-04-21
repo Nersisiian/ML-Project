@@ -1,0 +1,51 @@
+# Base configuration for all environments
+app:
+  name: "real-estate-price-predictor"
+  version: "2.0.0"
+  debug: false
+
+model:
+  name: "real_estate_predictor"
+  stage: "Production"
+  version: "latest"
+  n_features: 50
+  
+training:
+  batch_size: 1024
+  n_epochs: 100
+  learning_rate: 0.01
+  validation_split: 0.2
+  random_seed: 42
+  
+  # LightGBM specific
+  lgb_params:
+    objective: "regression"
+    metric: "mae"
+    boosting_type: "gbdt"
+    num_leaves: 255
+    learning_rate: 0.05
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    verbose: -1
+    
+data:
+  raw_path: "s3://real-estate-data/raw/"
+  processed_path: "s3://real-estate-data/processed/"
+  feature_path: "s3://real-estate-data/features/"
+  
+  feature_groups:
+    - property_characteristics
+    - location_features
+    - temporal_features
+    - derived_features
+    
+inference:
+  batch_size: 32
+  cache_ttl: 3600  # seconds
+  max_concurrent_requests: 1000
+  
+monitoring:
+  metrics_port: 9090
+  log_level: "INFO"
+  drift_threshold: 0.2

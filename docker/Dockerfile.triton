@@ -1,0 +1,9 @@
+FROM nvcr.io/nvidia/tritonserver:23.10-py3
+
+RUN pip install mlflow==2.8.0 lightgbm==4.1.0 numpy==1.24.3
+
+WORKDIR /models
+
+COPY ml/models/saved_models/ /models/real_estate/1/
+
+CMD ["tritonserver", "--model-repository=/models", "--allow-gpu-metrics=true"]

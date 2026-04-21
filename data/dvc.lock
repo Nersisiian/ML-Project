@@ -1,0 +1,52 @@
+# DVC lock file - tracks data versioning
+schema: '2.0'
+stages:
+  raw_data:
+    cmd: python scripts/download_raw_data.py
+    deps:
+    - path: scripts/download_raw_data.py
+      md5: a1b2c3d4e5f678901234567890123456
+    outs:
+    - path: data/raw/properties.parquet
+      md5: b2c3d4e5f67890123456789012345678
+      size: 157286400
+    - path: data/raw/sales_history.parquet
+      md5: c3d4e5f6789012345678901234567890
+      size: 52428800
+  
+  processed_data:
+    cmd: python scripts/process_data.py
+    deps:
+    - path: data/raw/properties.parquet
+      md5: b2c3d4e5f67890123456789012345678
+    - path: data/raw/sales_history.parquet
+      md5: c3d4e5f6789012345678901234567890
+    - path: scripts/process_data.py
+      md5: d4e5f67890123456789012345678901
+    outs:
+    - path: data/processed/cleaned_data.parquet
+      md5: e5f67890123456789012345678901234
+      size: 104857600
+  
+  features:
+    cmd: python scripts/create_features.py
+    deps:
+    - path: data/processed/cleaned_data.parquet
+      md5: e5f67890123456789012345678901234
+    - path: scripts/create_features.py
+      md5: f678901234567890123456789012345
+    outs:
+    - path: data/features/train_features.parquet
+      md5: 67890123456789012345678901234567
+      size: 73400320
+    - path: data/features/test_features.parquet
+      md5: 78901234567890123456789012345678
+      size: 18350080
+    - path: data/features/feature_names.pkl
+      md5: 89012345678901234567890123456789
+      size: 8192
+
+metrics:
+  - path: metrics/model_metrics.json
+    md5: 90123456789012345678901234567890
+    size: 1024

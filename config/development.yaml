@@ -1,0 +1,21 @@
+# Development environment config
+app:
+  debug: true
+
+data:
+  raw_path: "data/raw/"
+  processed_path: "data/processed/"
+  feature_path: "data/features/"
+
+model:
+  stage: "Staging"
+
+training:
+  batch_size: 32
+  n_epochs: 5
+
+inference:
+  cache_ttl: 60
+
+monitoring:
+  log_level: "DEBUG"

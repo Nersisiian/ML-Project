@@ -1,0 +1,57 @@
+{
+  "dashboard": {
+    "title": "ML Model Performance",
+    "panels": [
+      {
+        "title": "Prediction Latency (p95)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(prediction_latency_seconds_bucket[5m]))",
+            "legendFormat": "p95 latency"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Prediction Throughput",
+        "targets": [
+          {
+            "expr": "rate(predictions_total[1m])",
+            "legendFormat": "req/s"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Model MAE over Time",
+        "targets": [
+          {
+            "expr": "model_score{metric='mae'}",
+            "legendFormat": "MAE"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Error Rate",
+        "targets": [
+          {
+            "expr": "rate(predictions_total{status='error'}[5m]) / rate(predictions_total[5m])",
+            "legendFormat": "error rate"
+          }
+        ],
+        "type": "graph"
+      },
+      {
+        "title": "Cache Hit Ratio",
+        "targets": [
+          {
+            "expr": "cache_hit_ratio",
+            "legendFormat": "hit ratio"
+          }
+        ],
+        "type": "gauge"
+      }
+    ]
+  }
+}
