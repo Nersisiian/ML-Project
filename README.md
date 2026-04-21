@@ -184,7 +184,7 @@ testВсе тесты (43)~45s
 securityБезопасность (bandit)~20s
 dockerСборка Docker образа~60s
 deployДеплой на Render~90s
-Статус: https://github.com/Nersisiian/ML-Project/actions/workflows/ci.yml/badge.svg
+Статус: [![CI Pipeline](https://github.com/Nersisiian/ML-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/Nersisiian/ML-Project/actions/workflows/ci.yml)
 
 
 ``
